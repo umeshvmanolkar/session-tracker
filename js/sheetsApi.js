@@ -2,16 +2,14 @@
 
 const SheetsAPI = (function() {
   
-  function getGasUrl() {
-    return localStorage.getItem('tracko_gas_url');
-  }
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwscIylVkFnzCPkOVNs2R8g34WQcRcIYwYv1kWTqSWmsSr7bWMhh53LP9_HYQeQWlg/exec";
 
-  function setGasUrl(url) {
-    localStorage.setItem('tracko_gas_url', url);
+  function getGasUrl() {
+    return GAS_URL;
   }
 
   function hasGasUrl() {
-    return !!getGasUrl();
+    return true;
   }
 
   async function postData(payload) {

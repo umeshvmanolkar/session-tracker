@@ -145,20 +145,6 @@ function checkAuth() {
 function showLogin() {
   document.getElementById('view-app').classList.add('d-none');
   document.getElementById('view-login').classList.remove('d-none');
-  
-  // If no GAS URL, inject a config input dynamically into login screen so user can paste it
-  if (!SheetsAPI.hasGasUrl()) {
-    if (!document.getElementById('login-gas-url')) {
-      const form = document.getElementById('login-form');
-      const gasDiv = document.createElement('div');
-      gasDiv.style.marginBottom = '16px';
-      gasDiv.innerHTML = `
-        <p style="font-size:11px;color:#991b1b;margin-bottom:4px;font-weight:500;">Missing GAS Web App URL</p>
-        <input type="text" id="login-gas-url" class="fi" placeholder="https://script.google.com/macros/s/.../exec" required>
-      `;
-      form.insertBefore(gasDiv, form.firstElementChild);
-    }
-  }
 }
 
 function showApp() {
@@ -174,14 +160,6 @@ function showApp() {
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  
-  const gasInput = document.getElementById('login-gas-url');
-  if (gasInput && gasInput.value) {
-    SheetsAPI.setGasUrl(gasInput.value);
-  } else if (!SheetsAPI.hasGasUrl()) {
-    showToast("Please provide the GAS URL.", true);
-    return;
-  }
   
   const user = document.getElementById('login-username').value;
   const pass = document.getElementById('login-password').value;

@@ -5,6 +5,8 @@ window.render_settings = function() {
   
   // GAS Config
   document.getElementById('set-gas-url').value = SheetsAPI.getGasUrl() || '';
+  document.getElementById('set-gas-url').disabled = true;
+  document.getElementById('form-gas-url').querySelector('button').style.display = 'none';
   
   // Bankroll Config
   document.getElementById('cfg-daily-target').value = getConfigVal('daily_target_per_account', 300);
@@ -28,9 +30,7 @@ window.render_settings = function() {
 
 document.getElementById('form-gas-url').addEventListener('submit', (e) => {
   e.preventDefault();
-  const url = document.getElementById('set-gas-url').value.trim();
-  SheetsAPI.setGasUrl(url);
-  showToast("GAS API URL Saved!");
+  showToast("URL is hardcoded in code.");
 });
 
 document.getElementById('form-config').addEventListener('submit', async (e) => {
