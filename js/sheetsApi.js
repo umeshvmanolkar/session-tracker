@@ -34,7 +34,6 @@ const SheetsAPI = (function() {
 
   return {
     getGasUrl,
-    setGasUrl,
     hasGasUrl,
 
     login: async (username, password_hash) => {
