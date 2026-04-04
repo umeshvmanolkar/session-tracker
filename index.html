@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- GLOBAL LOADER -->
+  <div id="global-loader" class="d-none">
+    <div class="loader"></div>
+    <p style="font-weight:500;" id="loader-text">Loading...</p>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- LOGIN VIEW -->
+  <div id="view-login" class="login-container">
+    <div class="login-box">
+      <div style="background:#0f172a;padding:36px 28px 24px;">
+        <div style="width:36px;height:36px;border-radius:10px;background:#1e3a5f;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+          <div style="width:14px;height:14px;border-radius:3px;border:2px solid #93c5fd;"></div>
+        </div>
+        <p style="font-size:18px;font-weight:500;color:#fff;margin-bottom:3px;">Session Tracker</p>
+        <p style="font-size:11px;color:rgba(255,255,255,.35);">Bankroll manager</p>
+      </div>
+      <div style="padding:20px 24px 24px;">
+        <form id="login-form">
+          <div style="margin-bottom:12px;">
+            <p style="font-size:11px;color:#666;margin-bottom:4px;">Username</p>
+            <input type="text" id="login-username" class="fi" placeholder="your username" required>
+          </div>
+          <div style="margin-bottom:16px;">
+            <p style="font-size:11px;color:#666;margin-bottom:4px;">Password</p>
+            <input type="password" id="login-password" class="fi" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-p" style="width:100%;">Sign in</button>
+        </form>
+        <p style="font-size:10px;color:#bbb;text-align:center;margin-top:12px;">Credentials verified via Google Sheets</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP VIEW -->
+  <div id="view-app" class="app-container d-none">
+    <div class="topbar">
+      <span class="tl">Session Tracker</span>
+      <div class="tr">
+        <span id="topbar-date">Mon, 30 Mar</span>
+        <div class="ava" id="topbar-avatar" title="Logout">YO</div>
+        <button id="logout-btn" class="logout-btn">Log out</button>
+      </div>
+    </div>
+    
+    <div class="main-wrapper">
+      <div class="sidebar">
+        <div class="si" data-target="dashboard">Dashboard</div>
+        <div class="si" data-target="logSession">Log session</div>
+        <div class="si" data-target="accounts">Accounts</div>
+        <div class="si" data-target="fundManager">Fund manager</div>
+        <div class="si" data-target="checkpoints">Checkpoints</div>
+        <div class="sep"></div>
+        <div class="si" data-target="history">History</div>
+        <div class="si" data-target="settings">Settings</div>
+      </div>
+      
+      <div class="body">
+        <!-- GLOBAL BANNER (e.g. Checkpoint Hit or 3 Loss Streak) -->
+        <div id="global-banner-container"></div>
+        
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page-section">
+          <p class="pt">Today's overview</p>
+          <div class="g4" id="dash-stats">
+            <!-- Stat Cards Rendered Here -->
+          </div>
+          <div class="g2">
+            <div class="card">
+              <p class="ct">Account status</p>
+              <div style="display:grid;grid-template-columns:45px 1fr 50px 55px 48px;gap:6px;margin-bottom:4px;">
+                <span class="th2">ACC</span><span class="th2">BALANCE</span><span class="th2">TODAY</span><span class="th2">TARGET</span><span class="th2">STATUS</span>
+              </div>
+              <div id="dash-table-acc"></div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:8px;">
+                <p class="ct">Daily target progress</p>
+                <div id="dash-progress"></div>
+              </div>
+              <div class="card">
+                <p class="ct">Recent sessions</p>
+                <div id="dash-recent-sessions"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOG SESSION -->
+        <div id="page-logSession" class="page-section d-none">
+          <p class="pt">Log a session</p>
+          <form id="form-log-session" style="max-width: 500px;">
+            <div class="g2">
+              <div>
+                <p style="font-size:11px;color:#777;margin-bottom:4px;">Account</p>
+                <select id="log-account" class="fi" required></select>
+              </div>
+              <div>
+                <p style="font-size:11px;color:#777;margin-bottom:4px;">Game played</p>
+                <input type="text" id="log-game" class="fi" placeholder="Dice, Mines, etc." required>
+              </div>
+            </div>
+            <div class="g3">
+              <div>
+                <p style="font-size:11px;color:#777;margin-bottom:4px;">Opening balance</p>
+                <input type="number" id="log-opening" class="fi" step="0.01" required>
+              </div>
+              <div>
+                <p style="font-size:11px;color:#777;margin-bottom:4px;">Closing balance</p>
+                <input type="number" id="log-closing" class="fi" step="0.01" placeholder="₹ amount" required>
+              </div>
+              <div>
+                <p style="font-size:11px;color:#777;margin-bottom:4px;">Duration (min)</p>
+                <input type="number" id="log-duration" class="fi" min="1" required>
+              </div>
+            </div>
+            <p style="font-size:11px;color:#777;margin-bottom:6px;">Result</p>
+            <div class="result-toggle" id="log-result-group">
+              <div class="rt-btn" data-val="Win">Win</div>
+              <div class="rt-btn" data-val="Loss">Loss</div>
+              <div class="rt-btn" data-val="Skip">Skip</div>
+            </div>
+            <div id="log-preview" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#166534;"></div>
+            <p style="font-size:11px;color:#777;margin-bottom:4px;">Notes (optional)</p>
+            <input type="text" id="log-notes" class="fi" placeholder="e.g. stopped on time">
+            <button type="submit" class="btn btn-p" style="width:100%;">Save to Google Sheets</button>
+          </form>
+        </div>
+
+        <!-- ACCOUNTS -->
+        <div id="page-accounts" class="page-section d-none">
+          <p class="pt">Accounts</p>
+          <div class="g2" id="accounts-grid"></div>
+        </div>
+
+        <!-- FUND MANAGER -->
+        <div id="page-fundManager" class="page-section d-none">
+          <p class="pt">Fund manager</p>
+          <div class="g3" style="margin-bottom:20px;" id="fund-stats">
+          </div>
+          <div class="seg" id="fund-tabs" style="max-width:400px;">
+            <div class="seg-o sel" data-tab="deposit">Deposit</div>
+            <div class="seg-o" data-tab="withdrawal">Withdrawal</div>
+            <div class="seg-o" data-tab="history">History</div>
+          </div>
+          
+          <div id="fund-deposit-view" class="card" style="max-width:500px;">
+            <p class="ct">Add funds (Deposit)</p>
+            <form id="form-deposit">
+              <div class="g2">
+                <div>
+                  <p style="font-size:11px;color:#777;margin-bottom:4px;">Amount (₹)</p>
+                  <input type="number" id="dep-amount" class="fi" required min="1">
+                </div>
+                <div>
+                  <p style="font-size:11px;color:#777;margin-bottom:4px;">Deposit into</p>
+                  <select id="dep-account" class="fi" required>
+                    <option value="ALL">Split equally — all accounts</option>
+                  </select>
+                </div>
+              </div>
+              <div id="dep-preview" style="display:none;background:#eff6ff;border-radius:6px;padding:10px;margin-bottom:12px;font-size:12px;color:#1e40af;"></div>
+              <p style="font-size:11px;color:#777;margin-bottom:4px;">Notes</p>
+              <input type="text" id="dep-notes" class="fi">
+              <button type="submit" class="btn btn-g" style="width:100%;">Confirm deposit</button>
+            </form>
+          </div>
+
+          <div id="fund-withdrawal-view" class="card d-none" style="max-width:500px;">
+            <p class="ct">Withdraw funds</p>
+            <form id="form-withdraw">
+              <div class="g2">
+                <div>
+                  <p style="font-size:11px;color:#777;margin-bottom:4px;">Amount (₹)</p>
+                  <input type="number" id="with-amount" class="fi" required min="1">
+                </div>
+                <div>
+                  <p style="font-size:11px;color:#777;margin-bottom:4px;">Withdraw from</p>
+                  <select id="with-account" class="fi" required>
+                    <option value="ALL">Split equally</option>
+                  </select>
+                </div>
+              </div>
+              <div id="with-preview" style="display:none;background:#ffedd5;border-radius:6px;padding:10px;margin-bottom:12px;font-size:12px;color:#9a3412;"></div>
+              <p style="font-size:11px;color:#777;margin-bottom:4px;">Notes</p>
+              <input type="text" id="with-notes" class="fi">
+              <button type="submit" class="btn btn-p" style="background:#ea580c;width:100%;">Confirm withdrawal</button>
+            </form>
+          </div>
+
+          <div id="fund-history-view" class="card d-none">
+            <p class="ct">Transaction History</p>
+            <div style="display:grid;grid-template-columns:80px 70px 1fr 80px 80px;gap:10px;margin-bottom:8px;">
+              <span class="th2">DATE</span><span class="th2">TYPE</span><span class="th2">ACCOUNT / NOTES</span><span class="th2">AMOUNT</span><span class="th2">BAL AFTER</span>
+            </div>
+            <div id="fund-history-list"></div>
+          </div>
+        </div>
+
+        <!-- CHECKPOINTS -->
+        <div id="page-checkpoints" class="page-section d-none" style="max-width:600px;">
+          <p class="pt">Checkpoints</p>
+          <div class="card" style="margin-bottom:20px;">
+            <p class="ct" id="cp-form-title">Add new checkpoint</p>
+            <form id="form-checkpoint">
+              <input type="hidden" id="cp-id-edit" value="">
+              <div class="g3">
+                <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Label</p><input type="text" id="cp-label" class="fi" required></div>
+                <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Trigger (₹)</p><input type="number" id="cp-trigger" class="fi" required min="1"></div>
+                <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Withdraw %</p><input type="number" id="cp-withdraw" class="fi" required min="0" max="100"></div>
+              </div>
+              <div style="display:flex;gap:10px;">
+                <button type="submit" class="btn btn-p" id="cp-submit-btn">Add checkpoint</button>
+                <button type="button" class="btn btn-s d-none" id="cp-cancel-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+          <div id="checkpoints-list"></div>
+        </div>
+
+        <!-- HISTORY -->
+        <div id="page-history" class="page-section d-none">
+          <p class="pt">Session history</p>
+          <div class="g4" id="hist-stats"></div>
+          <div class="card" style="margin-bottom:20px;">
+            <p class="ct">Daily P&L — last 14 days</p>
+            <canvas id="hist-chart" style="max-height: 200px;"></canvas>
+          </div>
+          <div class="card">
+            <div style="display:flex;gap:10px;margin-bottom:16px;">
+              <select id="hist-filter-acc" class="fi" style="margin:0;max-width:150px;"><option value="ALL">All accounts</option></select>
+            </div>
+            <div style="display:grid;grid-template-columns:60px 60px 1.5fr 70px 70px 70px;gap:8px;margin-bottom:8px;">
+              <span class="th2">DATE</span><span class="th2">TIME</span><span class="th2">ACCOUNT · GAME</span><span class="th2">OPENING</span><span class="th2">CLOSING</span><span class="th2">P&L</span>
+            </div>
+            <div id="hist-table-list"></div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="page-settings" class="page-section d-none" style="max-width:500px;">
+          <p class="pt">Settings</p>
+          <div class="card" style="margin-bottom:20px;">
+            <p class="ct">GAS API Config</p>
+            <form id="form-gas-url">
+              <p style="font-size:11px;color:#777;margin-bottom:4px;">Google Apps Script Web App URL</p>
+              <input type="text" id="set-gas-url" class="fi" placeholder="https://script.google.com/macros/s/.../exec">
+              <button type="submit" class="btn btn-p">Save URL</button>
+            </form>
+          </div>
+          
+          <div class="card" style="margin-bottom:20px;">
+            <p class="ct">Bankroll config</p>
+            <form id="form-config">
+              <div class="g2">
+                <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Daily target / account (₹)</p><input type="number" id="cfg-daily-target" class="fi" required></div>
+                <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Sessions per day</p><input type="number" id="cfg-sessions-day" class="fi" required></div>
+                <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Session bankroll %</p><input type="number" id="cfg-session-pct" class="fi" required></div>
+                <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Max bet %</p><input type="number" id="cfg-max-bet" class="fi" required></div>
+              </div>
+              <button type="submit" class="btn btn-p">Save config</button>
+            </form>
+          </div>
+          
+          <div class="card">
+            <p class="ct">Manage accounts</p>
+            <div id="settings-acc-list"></div>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;">
+              <form id="form-add-acc">
+                <div class="g2">
+                  <div><p style="font-size:11px;color:#777;margin-bottom:4px;">New account name</p><input type="text" id="set-new-acc-name" class="fi" required></div>
+                  <div><p style="font-size:11px;color:#777;margin-bottom:4px;">Starting balance (₹)</p><input type="number" id="set-new-acc-bal" class="fi" required></div>
+                </div>
+                <button type="submit" class="btn btn-s">+ Add account</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sheetsApi.js"></script>
+  <script src="js/pages/dashboard.js"></script>
+  <script src="js/pages/logSession.js"></script>
+  <script src="js/pages/accounts.js"></script>
+  <script src="js/pages/fundManager.js"></script>
+  <script src="js/pages/checkpoints.js"></script>
+  <script src="js/pages/history.js"></script>
+  <script src="js/pages/settings.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
