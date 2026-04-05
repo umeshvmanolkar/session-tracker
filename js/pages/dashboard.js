@@ -58,11 +58,11 @@ window.render_dashboard = function() {
 
     htmlTable += `
       <div class="row" style="padding:8px 0; border-bottom:0.5px solid #f3f4f6;">
-        <span style="font-weight:500;">${acc.account_name}</span>
-        <span>${formatCurrency(acc.current_balance)}</span>
-        <span style="color:${accPnl >= 0 ? '#166534' : '#991b1b'};">${accPnl >= 0 ? '+' : ''}${formatCurrency(accPnl)}</span>
-        <span>${formatCurrency(targetPerAcc)}</span>
-        <span><span class="badge ${statusClass}">${statusText.toLowerCase()}</span></span>
+        <span style="font-weight:500; width: 25%;">${acc.account_name}</span>
+        <span style="width: 25%;">${formatCurrency(acc.current_balance)}</span>
+        <span style="width: 20%; text-align: right; color:${accPnl >= 0 ? '#166534' : '#991b1b'};">${accPnl > 0 ? '+' : ''}${formatCurrency(accPnl)}</span>
+        <span style="width: 20%; text-align: right;">${formatCurrency(targetPerAcc)}</span>
+        <span style="width: 10%; display: flex; justify-content: flex-end;"><span class="badge ${statusClass}">${statusText.toLowerCase()}</span></span>
       </div>
     `;
 
