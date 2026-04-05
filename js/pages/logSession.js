@@ -1,6 +1,7 @@
 // js/pages/logSession.js
 
 let logCurrentResult = '';
+let userManuallySelectedResult = false;
 
 window.render_logSession = function() {
   const accountSelect = document.getElementById('log-account');
@@ -34,6 +35,7 @@ document.querySelectorAll('.rt-btn').forEach(btn => {
     document.querySelectorAll('.rt-btn').forEach(b => b.classList.remove('sel'));
     btn.classList.add('sel');
     logCurrentResult = btn.getAttribute('data-val');
+    userManuallySelectedResult = true;
     calculateLogPreview();
   });
 });
@@ -66,12 +68,13 @@ function calculateLogPreview() {
   previewBox.style.borderColor = pnl >= 0 ? '#bbf7d0' : '#fecaca';
   previewBox.style.color = pnl >= 0 ? '#166534' : '#991b1b';
   
-  // auto select Win/Loss if user didn't manually click
-  if (!logCurrentResult || document.querySelectorAll('.rt-btn.sel').length === 0) {
+  // auto select Win/Loss if user hasn't manually clicked
+  if (!userManuallySelectedResult) {
     const autoRes = pnl > 0 ? 'Win' : (pnl < 0 ? 'Loss' : 'Skip');
     logCurrentResult = autoRes;
     document.querySelectorAll('.rt-btn').forEach(b => b.classList.remove('sel'));
-    document.querySelector(`.rt-btn[data-val="${autoRes}"]`).classList.add('sel');
+    const btnToSelect = document.querySelector(`.rt-btn[data-val="${autoRes}"]`);
+    if(btnToSelect) btnToSelect.classList.add('sel');
   }
 }
 
@@ -116,6 +119,7 @@ document.getElementById('form-log-session').addEventListener('submit', async (e)
     document.getElementById('form-log-session').reset();
     document.querySelectorAll('.rt-btn').forEach(b => b.classList.remove('sel'));
     logCurrentResult = '';
+    userManuallySelectedResult = false;
     document.getElementById('log-preview').style.display = 'none';
     
     // Go to dashboard
