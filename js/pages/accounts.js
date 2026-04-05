@@ -5,7 +5,8 @@ window.render_accounts = function() {
   
   const bankrollPct = getConfigVal('session_bankroll_pct', 20) / 100;
   const maxBetPct = getConfigVal('max_bet_pct', 5) / 100;
-  const targetPerAcc = getAccountDailyTarget();
+  const targetPerAcc = getConfigVal('daily_target_per_account', 300);
+  const sessionTarget = getSessionTargetPerAccount();
   const todayStr = getTodayString();
   const todaySessions = sessions.filter(s => s.date === todayStr);
   
@@ -64,7 +65,8 @@ window.render_accounts = function() {
         <div class="divider"></div>
         <div class="acc-row2"><span>Session bankroll</span><span style="font-weight:500;color:#111;">${formatCurrency(sessionBankroll)}</span></div>
         <div class="acc-row2"><span>Max bet</span><span style="font-weight:500;color:#111;">${formatCurrency(maxBet)}</span></div>
-        <div class="acc-row2"><span>Session target</span><span style="font-weight:500;color:#111;">${formatCurrency(targetPerAcc)}</span></div>
+        <div class="acc-row2"><span>Session target</span><span style="font-weight:500;color:#111;">${formatCurrency(sessionTarget)}</span></div>
+        <div class="acc-row2"><span>Daily target</span><span style="font-weight:500;color:#111;">${formatCurrency(targetPerAcc)}</span></div>
         <div class="acc-row2"><span>Today's P&L</span><span style="font-weight:500;color:${pnl >= 0 ? '#166534' : '#999'};">${pnl > 0 ? '+' : ''}${pnl !== 0 ? formatCurrency(pnl) : '₹0'}</span></div>
         <div class="divider"></div>
         <p style="font-size:9px;color:#aaa;margin-bottom:4px;">Last 3 sessions</p>

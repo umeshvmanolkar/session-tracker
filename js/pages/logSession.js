@@ -53,7 +53,7 @@ function calculateLogPreview() {
   }
   
   const pnl = clse - open;
-  const targetPerAcc = getAccountDailyTarget();
+  const targetPerAcc = getSessionTargetPerAccount();
   let msg = `P&L preview: <strong>${pnl >= 0 ? '+' : ''}${formatCurrency(pnl)}</strong> · Session target: ${formatCurrency(targetPerAcc)}`;
   
   if (pnl >= targetPerAcc) {

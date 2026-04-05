@@ -3,7 +3,7 @@
 window.render_dashboard = function() {
   const { accounts, sessions, checkpoints } = AppState.data;
   const todayStr = getTodayString();
-  const targetPerAcc = getAccountDailyTarget();
+  const targetPerAcc = getConfigVal('daily_target_per_account', 300);
   
   // 1. Calculate Stats
   const totalBalance = getTotalBalance();
@@ -57,12 +57,12 @@ window.render_dashboard = function() {
     }
 
     htmlTable += `
-      <div style="display:grid;grid-template-columns:45px 1fr 50px 55px 48px;gap:6px;align-items:center;padding:8px 0;border-bottom:0.5px solid #f3f4f6;font-size:13px;color:#333;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 60px;gap:10px;align-items:center;padding:10px 0;border-bottom:0.5px solid #f3f4f6;font-size:13px;color:#333;">
         <span style="font-weight:500;">${acc.account_name}</span>
-        <span>${formatCurrency(acc.current_balance)}</span>
-        <span style="color:${accPnl >= 0 ? '#166534' : '#991b1b'};">${accPnl > 0 ? '+' : ''}${formatCurrency(accPnl)}</span>
-        <span>${formatCurrency(targetPerAcc)}</span>
-        <span><span class="badge ${statusClass}">${statusText.toLowerCase()}</span></span>
+        <span style="font-weight:500;">${formatCurrency(acc.current_balance)}</span>
+        <span style="color:${accPnl >= 0 ? '#166534' : '#991b1b'}; font-weight:500;">${accPnl > 0 ? '+' : ''}${formatCurrency(accPnl)}</span>
+        <span style="font-weight:500;">${formatCurrency(targetPerAcc)}</span>
+        <div style="display:flex; justify-content:flex-end;"><span class="badge ${statusClass}">${statusText.toLowerCase()}</span></div>
       </div>
     `;
 

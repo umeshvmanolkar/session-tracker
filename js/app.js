@@ -79,14 +79,11 @@ function getTotalBalance() {
   return AppState.data.accounts.reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0);
 }
 
-function getAccountDailyTarget() {
+function getSessionTargetPerAccount() {
   const target = getConfigVal('daily_target_per_account', 300);
   const sessions = getConfigVal('sessions_per_day', 8);
-  const accCount = AppState.data.accounts.length || 1; // avoid division by zero
-  // As per rules: daily_target_per_account / (sessions_per_day / account_count)
-  // This logic from prompt: Session target per account = daily_target_per_account ÷ (sessions_per_day ÷ account_count)
-  const sessionTarget = target / (sessions / accCount);
-  return sessionTarget;
+  const accCount = AppState.data.accounts.length || 1;
+  return target / (sessions / accCount);
 }
 
 // Check for 3 loss streak today across all accounts
