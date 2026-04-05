@@ -50,7 +50,7 @@ function doPost(e) {
 function getSheetData(sheetName) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   if (!sheet) return [];
-  const data = sheet.getDataRange().getValues();
+  const data = sheet.getDataRange().getDisplayValues();
   if (data.length <= 1) return [];
   const headers = data[0];
   const rows = [];
